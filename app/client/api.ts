@@ -8,6 +8,7 @@ import {
 import { ChatMessage, ModelType, useAccessStore, useChatStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 import { GeminiProApi } from "./platforms/google";
+import { ChatGLMApi } from "./platforms/chatglm";
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
 
@@ -86,6 +87,13 @@ export class ClientApi {
   public llm: LLMApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
+    console.log("🚀 ~ file: api.ts:ClientApi.constructor ~ provider", provider);
+    if (provider === ModelProvider.GLM) {
+      console.log("[use GLM]");
+      this.llm = new ChatGLMApi();
+      return;
+    }
+
     if (provider === ModelProvider.GeminiPro) {
       this.llm = new GeminiProApi();
       return;
@@ -144,9 +152,10 @@ export function getHeaders() {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
-    "Accept": "application/json",
+    Accept: "application/json",
   };
   const modelConfig = useChatStore.getState().currentSession().mask.modelConfig;
+  const isChatGLM = ["glm-4", "chatglm_pro"].includes(modelConfig.model);
   const isGoogle = modelConfig.model === "gemini-pro";
   const isAzure = accessStore.provider === ServiceProvider.Azure;
   const authHeader = isAzure ? "api-key" : "Authorization";
@@ -158,6 +167,14 @@ export function getHeaders() {
 
   const makeBearer = (s: string) => `${isAzure ? "" : "Bearer "}${s.trim()}`;
   const validString = (x: string) => x && x.length > 0;
+  console.log("set headers 1", authHeader, headers);
+
+  if (isChatGLM) {
+    headers[authHeader] = makeBearer(
+      ACCESS_CODE_PREFIX + accessStore.accessCode,
+    );
+    return headers;
+  }
 
   // use user's api key first
   if (validString(apiKey)) {
@@ -166,6 +183,7 @@ export function getHeaders() {
     accessStore.enabledAccessControl() &&
     validString(accessStore.accessCode)
   ) {
+    console.log("set headers 2", authHeader);
     headers[authHeader] = makeBearer(
       ACCESS_CODE_PREFIX + accessStore.accessCode,
     );

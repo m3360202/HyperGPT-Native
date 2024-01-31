@@ -14,6 +14,8 @@ export const OPENAI_BASE_URL = "https://api.openai.com";
 
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 
+export const CHATGLM_BASE_URL = "https://open.bigmodel.cn/api/paas/";
+
 export enum Path {
   Home = "/",
   Chat = "/chat",
@@ -26,6 +28,7 @@ export enum Path {
 export enum ApiPath {
   Cors = "/api/cors",
   OpenAI = "/api/openai",
+  ChatGLM = "/api/chatglm",
 }
 
 export enum SlotID {
@@ -68,11 +71,13 @@ export enum ServiceProvider {
   OpenAI = "OpenAI",
   Azure = "Azure",
   Google = "Google",
+  ChatGLM = "ChatGLM",
 }
 
 export enum ModelProvider {
   GPT = "GPT",
   GeminiPro = "GeminiPro",
+  GLM = "GLM",
 }
 
 export const OpenaiPath = {
@@ -91,6 +96,11 @@ export const Google = {
   ChatPath: "v1beta/models/gemini-pro:generateContent",
 
   // /api/openai/v1/chat/completions
+};
+
+export const ChatGLM = {
+  ExampleEndpoint: "https://open.bigmodel.cn/api/paas",
+  ChatPath: "v4/chat/completions",
 };
 
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
@@ -245,6 +255,24 @@ export const DEFAULT_MODELS = [
       id: "google",
       providerName: "Google",
       providerType: "google",
+    },
+  },
+  {
+    name: "glm-4",
+    available: true,
+    provider: {
+      id: "chatglm",
+      providerName: "ChatGLM",
+      providerType: "chatglm",
+    },
+  },
+  {
+    name: "chatglm_pro",
+    available: true,
+    provider: {
+      id: "chatglm",
+      providerName: "ChatGLM",
+      providerType: "chatglm",
     },
   },
 ] as const;

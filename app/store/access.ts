@@ -65,6 +65,10 @@ export const useAccessStore = createPersistStore(
       return ensure(get(), ["googleApiKey"]);
     },
 
+    isValidChatGLM() {
+      return ensure(get(), ["googleApiKey"]);
+    },
+
     isAuthorized() {
       this.fetch();
 
@@ -73,6 +77,7 @@ export const useAccessStore = createPersistStore(
         this.isValidOpenAI() ||
         this.isValidAzure() ||
         this.isValidGoogle() ||
+        this.isValidChatGLM() ||
         !this.enabledAccessControl() ||
         (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
       );
